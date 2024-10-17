@@ -58,7 +58,7 @@ workflow YAML_INPUT {
         .assembly_reads
         .multiMap { data ->
                     read_type:          data.read_type
-                    read_data:          data.read_data
+                    read_data:          file( data.read_data, type: 'dir', checkIfExists: true )
                     supplement:         data.supplementary_data
         }
         .set { assem_reads }
@@ -66,7 +66,7 @@ workflow YAML_INPUT {
     group
         .hic_data
         .multiMap { data ->
-                    hic_cram:          data.hic_cram
+                    hic_cram:          file( data.hic_cram, type: 'dir', checkIfExists: true )
                     hic_aligner:       data.hic_aligner
         }
         .set { hic }

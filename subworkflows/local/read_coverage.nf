@@ -31,12 +31,15 @@ workflow READ_COVERAGE {
     //
     // LOGIC: TAKE THE READ FOLDER AS INPUT AND GENERATE THE CHANNEL OF READ FILES
     //
-    ch_grabbed_reads_path       = GrabFiles( read_ch )
+    ch_grabbed_reads_path       = read_ch.map { meta, read_dir ->
+        tuple(meta, files( read_dir.resolve('*.{fa,fasta}.gz'), checkIfExists: true ))
+    }
+    // ch_grabbed_reads_path       = GrabFiles( read_ch )
 
     ch_grabbed_reads_path
-        .map { meta, files ->
-            tuple( files )
-        }
+    //     .map { meta, files ->
+    //         tuple( files )
+    //     }
         .flatten()
         .set { ch_reads_path }
 
@@ -132,7 +135,7 @@ workflow READ_COVERAGE {
         }
         .set { genomecov_input }
 
-    
+
 
     //
     // MODULE: Genome2Cov
@@ -271,17 +274,17 @@ workflow READ_COVERAGE {
     versions                = ch_versions
 }
 
-process GrabFiles {
-    label 'process_tiny'
+// process GrabFiles {
+//     label 'process_tiny'
 
-    tag "${meta.id}"
-    executor 'local'
+//     tag "${meta.id}"
+//     executor 'local'
 
-    input:
-    tuple val(meta), path("in")
+//     input:
+//     tuple val(meta), path("in")
 
-    output:
-    tuple val(meta), path("in/*.{fa,fasta}.{gz}")
+//     output:
+//     tuple val(meta), path("in/*.{fa,fasta}.{gz}")
 
-    "true"
-}
+//     "true"
+// }

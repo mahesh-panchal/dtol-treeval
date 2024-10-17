@@ -341,10 +341,12 @@ workflow HIC_MAPPING {
     // LOGIC: FOR REPORTING
     //
 
-    ch_cram_files = GrabFiles( hic_reads_path )
+    ch_cram_files = hic_reads_path.map{ meta, cram_dir ->
+        tuple(meta, files( cram_dir.resolve("*.cram"), checkIfExists: true ) )
+    }
 
     ch_cram_files
-        .collect()
+        .collect() // TODO: Why is this here?
         .map { meta, cram ->
             tuple( [    id: 'cram',
                         sz: cram instanceof ArrayList ? cram.collect { it.size()} : cram.size(),
@@ -369,17 +371,17 @@ workflow HIC_MAPPING {
     versions            = ch_versions.ifEmpty(null)
 }
 
-process GrabFiles {
-    label 'process_tiny'
+// process GrabFiles {
+//     label 'process_tiny'
 
-    tag "${meta.id}"
-    executor 'local'
+//     tag "${meta.id}"
+//     executor 'local'
 
-    input:
-    tuple val(meta), path("in")
+//     input:
+//     tuple val(meta), path("in")
 
-    output:
-    tuple val(meta), path("in/*.cram")
+//     output:
+//     tuple val(meta), path("in/*.cram")
 
-    "true"
-}
+//     "true"
+// }

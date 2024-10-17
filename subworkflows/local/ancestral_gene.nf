@@ -70,6 +70,7 @@ workflow ANCESTRAL_GENE {
     ch_ancestral_bigbed     = UCSC_BEDTOBIGBED.out.bigbed
     versions                = ch_versions.ifEmpty(null)
 }
+
 process GrabFiles {
     label 'process_tiny'
 
