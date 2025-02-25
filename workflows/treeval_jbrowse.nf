@@ -69,10 +69,12 @@ workflow TREEVAL_JBROWSE {
 
     Channel
         .fromPath( "${projectDir}/assets/gene_alignment/assm_*.as", checkIfExists: true)
-        .map { it ->
-            tuple ([ type    :   it.toString().split('/')[-1].split('_')[-1].split('.as')[0] ],
-                    file(it)
-                )}
+        .map { as_file ->
+            tuple (
+                [ type: as_file.baseName.split('_').last() ],
+                as_file
+            )
+        }
         .set { gene_alignment_asfiles }
 
     Channel
