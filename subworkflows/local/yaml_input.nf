@@ -232,7 +232,7 @@ workflow YAML_INPUT {
     lineageinfo                      = busco_lineage.lineage
     lineagespath                     = busco_lineage.lineages_path
 
-    versions                         = ch_versions.ifEmpty(null)
+    versions                         = ch_versions
 }
 
 def readYAML( yamlfile ) {
