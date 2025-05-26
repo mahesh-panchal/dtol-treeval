@@ -411,7 +411,7 @@ workflow HIC_MAPPING {
     emit:
     mcool               = COOLER_ZOOMIFY.out.mcool
     ch_reporting        = ch_reporting_cram.collect()
-    versions            = ch_versions.ifEmpty(null)
+    versions            = ch_versions
 }
 
 process GrabFiles {

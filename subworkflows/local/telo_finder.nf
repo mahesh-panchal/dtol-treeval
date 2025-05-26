@@ -61,7 +61,7 @@ workflow TELO_FINDER {
     )
     ch_versions     = ch_versions.mix( FIND_TELOMERE_WINDOWS.out.versions )
 
-    
+
     def windows_file = FIND_TELOMERE_WINDOWS.out.windows
     def fallback_file = GAWK_CLEAN_TELOMERE.out.output
 
@@ -74,8 +74,8 @@ workflow TELO_FINDER {
     ch_versions     = ch_versions.mix( EXTRACT_TELO.out.versions )
 
     GAWK_MAP_TELO(
-        fallback_file, 
-        [], 
+        fallback_file,
+        [],
         false
     )
     ch_versions     = ch_versions.mix( GAWK_MAP_TELO.out.versions )
@@ -93,5 +93,5 @@ workflow TELO_FINDER {
     bed_file        = EXTRACT_TELO.out.bed.ifEmpty { GAWK_MAP_TELO.out.output }
     bed_gz_tbi      = TABIX_BGZIPTABIX.out.gz_tbi
     bedgraph_file   = EXTRACT_TELO.out.bedgraph
-    versions        = ch_versions.ifEmpty(null)
+    versions        = ch_versions
 }
