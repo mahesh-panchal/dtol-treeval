@@ -386,7 +386,7 @@ workflow HIC_MAPPING {
     //
     // LOGIC: FOR REPORTING
     //
-    ch_cram_files = GrabFiles( hic_reads_path )
+    ch_cram_files = hic_reads_path.map { meta, dir -> tuple(meta, files(dir.resolve("*.cram"), checkIfExists: true)) }
 
     ch_cram_files
         .collect()
@@ -412,19 +412,4 @@ workflow HIC_MAPPING {
     mcool               = COOLER_ZOOMIFY.out.mcool
     ch_reporting        = ch_reporting_cram.collect()
     versions            = ch_versions
-}
-
-process GrabFiles {
-    label 'process_tiny'
-
-    tag "${meta.id}"
-    executor 'local'
-
-    input:
-    tuple val(meta), path("in")
-
-    output:
-    tuple val(meta), path("in/*.cram")
-
-    "true"
 }

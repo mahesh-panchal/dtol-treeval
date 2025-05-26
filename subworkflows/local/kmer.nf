@@ -38,7 +38,7 @@ workflow KMER {
     //
     // MODULE: GETS PACBIO READ PATHS FROM READS_PATH
     //
-    ch_grabbed_read_paths   = GrabFiles( get_reads_input )
+    ch_grabbed_read_paths   = get_reads_input.map { meta, dir -> tuple(meta, files(dir.resolve("*.fasta.gz"), checkIfExists: true)) }
 
     //
     // MODULE: JOIN PACBIO READ
@@ -77,19 +77,4 @@ workflow KMER {
     merquryk_completeness   = MERQURYFK_MERQURYFK.out.stats  // meta, stats
     merquryk_qv             = MERQURYFK_MERQURYFK.out.qv     // meta, qv
     versions                = ch_versions
-}
-
-process GrabFiles {
-    label 'process_tiny'
-
-    tag "${meta.id}"
-    executor 'local'
-
-    input:
-    tuple val( meta ), path( "in" )
-
-    output:
-    tuple val( meta ), path( "in/*.fasta.gz" )
-
-    "true"
 }

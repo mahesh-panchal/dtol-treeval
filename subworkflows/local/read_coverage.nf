@@ -31,8 +31,7 @@ workflow READ_COVERAGE {
     //
     // LOGIC: TAKE THE READ FOLDER AS INPUT AND GENERATE THE CHANNEL OF READ FILES
     //
-    ch_grabbed_reads_path       = GrabFiles( read_ch )
-
+    ch_grabbed_reads_path       = read_ch.map { meta, dir -> tuple(meta, files(dir.resolve("*.{fa,fasta}.{gz}"), checkIfExists: true)) }
     ch_grabbed_reads_path
         .map { meta, files ->
             tuple( files )
@@ -274,19 +273,4 @@ workflow READ_COVERAGE {
     ch_covbw_nor            = BED2BW_NORMAL.out.bigwig
     ch_covbw_avg            = BED2BW_AVGCOV.out.bigwig
     versions                = ch_versions
-}
-
-process GrabFiles {
-    label 'process_tiny'
-
-    tag "${meta.id}"
-    executor 'local'
-
-    input:
-    tuple val(meta), path("in")
-
-    output:
-    tuple val(meta), path("in/*.{fa,fasta}.{gz}")
-
-    "true"
 }
