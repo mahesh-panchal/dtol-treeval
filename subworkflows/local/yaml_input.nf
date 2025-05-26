@@ -130,34 +130,19 @@ workflow YAML_INPUT {
         }
         .set { ref_ch }
 
-    if ( assem_reads.read_type.filter { it == "hifi" } || assem_reads.read_type.filter { it == "clr" } || assem_reads.read_type.filter { it == "ont" } ) {
-        tolid_version
-            .combine( assem_reads.read_type )
-            .combine( assem_reads.read_data )
-            .map{ sample, type, data ->
-                tuple(  [   id              : sample,
-                            single_end      : true,
-                            read_type       : type
-                        ],
-                        data
-                )
-            }
-        .set { read_ch }
-    }
-    else if ( assem_reads.read_type.filter { it == "illumina" } ) {
-        tolid_version
-            .combine( assem_reads.read_type )
-            .combine( assem_reads.read_data )
-            .map{ sample, type, data ->
-                tuple(  [   id              : sample,
-                            single_end      : false,
-                            read_type       : type
-                        ],
-                        data
-                )
-            }
-        .set { read_ch }
-    }
+    tolid_version
+        .combine( assem_reads.read_type )
+        .combine( assem_reads.read_data )
+        .filter{ _sample, type, _data -> type in ['hifi', 'clr', 'ont', 'illumina'] }
+        .map{ sample, type, data ->
+            tuple(  [   id              : sample,
+                        single_end      : type != "illumina",
+                        read_type       : type
+                    ],
+                    data
+            )
+        }
+    .set { read_ch }
 
     tolid_version
         .combine( hic.hic_cram )
