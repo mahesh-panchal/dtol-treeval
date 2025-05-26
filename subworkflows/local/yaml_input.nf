@@ -42,37 +42,37 @@ workflow YAML_INPUT {
     group
         .assembly
         .multiMap { data ->
-                    assem_level:        data.assem_level
-                    assem_version:      data.assem_version
-                    sample_id:          data.sample_id
-                    latin_name:         data.latin_name
-                    defined_class:      data.defined_class
-                    project_id:         data.project_id
+                    assem_level:        data.assem_level        // String
+                    assem_version:      data.assem_version      // Number
+                    sample_id:          data.sample_id          // String
+                    latin_name:         data.latin_name         // String
+                    defined_class:      data.defined_class      // String
+                    project_id:         data.project_id         // String
             }
         .set { assembly_data }
 
     group
         .assembly_reads
         .multiMap { data ->
-                    read_type:          data.read_type
-                    read_data:          data.read_data
-                    supplement:         data.supplementary_data
+                    read_type:          data.read_type          // String
+                    read_data:          file(data.read_data, checkIfExists: true, type: 'dir')
+                    supplement:         data.supplementary_data // ?
         }
         .set { assem_reads }
 
     group
         .hic_data
         .multiMap { data ->
-                    hic_cram:          data.hic_cram
-                    hic_aligner:       data.hic_aligner
+                    hic_cram:          file(data.hic_cram, checkIfExists: true, type: 'dir')
+                    hic_aligner:       data.hic_aligner          // String
         }
         .set { hic }
 
     group
         .kmer_profile
         .multiMap { data ->
-                    length:             data.kmer_length
-                    dir:                data.dir
+                    length:             data.kmer_length         // Number
+                    dir:                file(data.dir, checkIfExists: true, type: 'dir')
         }
         .set { kmer_profiling }
 
@@ -80,7 +80,7 @@ workflow YAML_INPUT {
         .alignment
         .combine(workflow_id)
         .multiMap{  data, id ->
-                    genesets:           (id == "FULL" || id == "JBROWSE" ? data.genesets           : "")
+                    genesets:           (id == "FULL" || id == "JBROWSE" ? data.genesets.collect{ geneset_path -> file(geneset_path, checkIfExists: true) } : "")
         }
         .set{ alignment_data }
 
@@ -88,22 +88,22 @@ workflow YAML_INPUT {
         .intron
         .combine( workflow_id )
         .multiMap { data, id ->
-                    size:			    (id == "FULL" ? data.size               : "")
+                    size:			    (id == "FULL" ? data.size               : "") // String
         }
         .set { intron_size }
 
     group
         .teloseq
         .multiMap { data ->
-                    teloseq:            data.teloseq
+                    teloseq:            data.teloseq               // String
         }
         .set { teloseq }
 
     group
         .busco_gene
         .multiMap { data ->
-                    lineage:			data.lineage
-                    lineages_path:		data.lineages_path
+                    lineage:			data.lineage                // String
+                    lineages_path:		file(data.lineages_path, checkIfExists: true, type:'dir')
         }
         .set { busco_lineage }
 
@@ -203,7 +203,7 @@ workflow YAML_INPUT {
     hic_reads_ch                     = hic_ch
     supp_reads_ch                    = supplement_ch
 
-    align_genesets                    = alignment_data.genesets
+    align_genesets                   = alignment_data.genesets
 
     synteny_paths                    = group.synteny
 
